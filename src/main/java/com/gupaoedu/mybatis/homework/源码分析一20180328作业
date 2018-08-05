@@ -1,0 +1,14 @@
+源码分析作业
+1. org.apache.ibatis.binding.MapperProxy#invoke 这个类的53行什么时候执行？
+
+  /**
+   * Backport of java.lang.reflect.Method#isDefault()
+   */
+  private boolean isDefaultMethod(Method method) {
+    return ((method.getModifiers()
+        & (Modifier.ABSTRACT | Modifier.PUBLIC | Modifier.STATIC)) == Modifier.PUBLIC)
+        && method.getDeclaringClass().isInterface();
+  }
+
+  method.getModifiers() 是抽象ABSTRACT或者公开PUBLIC或者静态STATIC的    等于PUBLIC 的
+ 而且method.getDeclaringClass().isInterface() 是接口的53行就会被执行

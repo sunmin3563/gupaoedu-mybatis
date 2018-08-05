@@ -23,9 +23,8 @@ public class ResultSetHandler {
         this.configuration = configuration;
     }
 
-    public <E> E handle(PreparedStatement pstmt, MapperRegistory.MapperData mapperData) throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public <E> E handle(ResultSet rs, MapperRegistory.MapperData mapperData) throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Object resultObj = new DefaultObjectFactory().create(mapperData.getType());
-        ResultSet rs = pstmt.getResultSet();
         if (rs.next()) {
             int i = 0;
             for (Field field : resultObj.getClass().getDeclaredFields()) {
@@ -42,6 +41,7 @@ public class ResultSetHandler {
 
     private Object getResult(Field field, ResultSet rs) throws SQLException {
         //TODO type handles
+        //bean属性的名字必须要和数据库column的名字一样
         Class<?> type = field.getType();
         if(Integer.class == type){
             return rs.getInt(field.getName());

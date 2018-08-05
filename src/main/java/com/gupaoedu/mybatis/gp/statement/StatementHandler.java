@@ -27,11 +27,11 @@ public class StatementHandler {
         try {
             //JDBC
             Connection conn = getConnection();
-            //TODO ParamenterHandler
+            //TODO ParameterHandler
             PreparedStatement pstmt = conn.prepareStatement(String.format(mapperData.getSql(), Integer.parseInt(String.valueOf(parameter))));
             pstmt.execute();
             //ResultSetHandler
-            return (E)resultSetHandler.handle(pstmt,mapperData);
+            return (E)resultSetHandler.handle(pstmt.getResultSet(),mapperData);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -44,7 +44,7 @@ public class StatementHandler {
         String driver = "com.mysql.cj.jdbc.Driver";
         String url = "jdbc:mysql://localhost:3306/gp?useUnicode=true&characterEncoding=utf-8&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
         String username = "root";
-        String password = "123456";
+        String password = "root";
         Connection conn = null;
         try {
             Class.forName(driver); //classLoader,加载对应驱动

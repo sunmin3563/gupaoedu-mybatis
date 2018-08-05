@@ -1,0 +1,22 @@
+1.怎么验证一级缓存的存在？
+一级缓存是session级别的缓存。当session在进行一次查询数据库后，会将查询结果放在localCache中localCache.putObject(key, list);
+如果session再进行同样查询的话，会返回已经查询的数据。依据代码
+
+private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+    List<E> list;
+    localCache.putObject(key, EXECUTION_PLACEHOLDER);
+    try {
+      list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
+    } finally {
+      localCache.removeObject(key);
+    }
+    localCache.putObject(key, list);
+    if (ms.getStatementType() == StatementType.CALLABLE) {
+      localOutputParameterCache.putObject(key, parameter);
+    }
+    return list;
+  }
+
+2.验证N+1问题
+N+1问题存在于嵌套查询中。当未设置延迟加载时，查询主数据的同时与其关联的从数据也会被查询出来。
+由关联关系的不同，如1:1 1:n 当主数据查询的同时 从数据会发送1条或n条sql去查询数据库 也就是n+1

@@ -1,0 +1,66 @@
+源码分析作业 20180331
+1. TestMapper 作者为什么要设计这样的形式来做？
+为什么不是一个class而是一个interface?
+
+如果是实现类的话需要写具体的实现方法，这边不需要
+用接口的话只需要拿到接口的方法就好了，而且只需要做一个阉割版的代理就好了，
+用实现类可能会调用到本来的方法，还可能是个空方法
+
+2.org.apache.ibatis.executor.BaseExecutor#queryFromDatabase 322行这行代码的意义
+localCache.putObject(key, EXECUTION_PLACEHOLDER);
+可以全局搜索下，逆向侧向找
+public boolean canLoad() {
+      return localCache.getObject(key) != null && localCache.getObject(key) != EXECUTION_PLACEHOLDER;
+}
+不为空并且不是占位符，占位符就是这个请求还在执行
+为了来做延时加载，比如说双十一的时候并发量很大，这种可以很有效的避免，同时只允许一个人进入
+
+
+3.MyBatis的plugin实现机制
+只有在初始化下面4中类的时候才需要plugin
+MyBatis 允许你在已映射语句执行过程中的某一点进行拦截调用。默认情况下，MyBatis 允许使用插件来拦截的方法调用包括：
+
+Executor (update, query, flushStatements, commit, rollback, getTransaction, close, isClosed)
+ParameterHandler (getParameterObject, setParameters)
+ResultSetHandler (handleResultSets, handleOutputParameters)
+StatementHandler (prepare, parameterize, batch, update, query)
+这些类中方法的细节可以通过查看每个方法的签名来发现，或者直接查看 MyBatis 发行包中的源代码。 如果你想做的不仅仅是监控方法的调用，那么你最好相当了解要重写的方法的行为。 因为如果在试图修改或重写已有方法的行为的时候，你很可能在破坏 MyBatis 的核心模块。 这些都是更低层的类和方法，所以使用插件的时候要特别当心。
+
+
+4.lazy loading 是怎么做到的？
+如果要验证的话一定要把config 的 lazy loading 打开
+com.gupao.dal.config.MybatisConfig  58行
+
+org.apache.ibatis.executor.resultset.DefaultResultSetHandler#createResultObject
+if (propertyMapping.getNestedQueryId() != null && propertyMapping.isLazy()) {
+如果嵌套查询并且打开懒加载的情况下，他会使用cglib去创建一个对象
+
+
+部分笔记
+
+createResultObject
+
+1.族群隔离
+2.分类选择大类处理
+3.日志、共性动作很好的分离
+
+
+同源下的delegate -->装饰器
+
+controller
+service
+	rpc
+	rpc
+	rpc
+
+
+1.0版本
+
+TestMapper --- > TestMapper.xml
+找到SQL
+
+
+
+
+
+
